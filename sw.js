@@ -1,4 +1,4 @@
-const CACHE_NAME = "shkala-signal-v3"
+const CACHE_NAME = "shkala-signal-v4"
 
 const 
 "./
@@ -11,6 +11,7 @@ const
 ];
 
 // install
+self.skipWaiting();
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -30,10 +31,36 @@ self.addEventListener("activate", event => {
   );
 });
 
-// fetch
-self.addEventListener("fetch", event => {
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // тільки для свого домену
+  if (url.origin !== location.origin) return;
+
+  // HTML: спочатку мережа, якщо нема — кеш
+  if (req.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname === "/") {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req).then((r) => r || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // все інше: спочатку кеш, якщо нема — мережа і докешувати
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    caches.match(req).then((cached) => {
+      if (cached) return cached;
+      return fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+        return res;
+      });
+    })
   );
 });
