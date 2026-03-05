@@ -1,4 +1,4 @@
-const CACHE_NAME = "shkala-signal-v1";
+const CACHE_NAME = "shkala-signal-v2";
 
 const 
 "./
