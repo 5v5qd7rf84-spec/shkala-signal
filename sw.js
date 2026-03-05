@@ -1,66 +1,87 @@
-const CACHE_NAME = "shkala-signal-v4"
+/* sw.js — stable offline for GitHub Pages + iOS PWA */
 
-const 
-"./
-./index.html
-./manifest.webmanifest
-./icon-180.png
-./icon-192.png
-./icon-512.png
-./icon-maskable-512.png"
+const VERSION = "v5"; // <-- міняй (v6, v7...) коли хочеш примусове оновлення
+const CACHE_NAME = `shkala-signal-${VERSION}`;
+
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./icon-180.png",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./icon-maskable-512.png",
+  "./sw.js"
 ];
 
-// install
-self.skipWaiting();
-self.addEventListener("install", event => {
+// Install: cache app shell
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-// activate
-self.addEventListener("activate", event => {
+// Activate: clean old caches + take control
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
-      )
-    )
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((k) => k.startsWith("shkala-signal-") && k !== CACHE_NAME)
+          .map((k) => caches.delete(k))
+      );
+      await self.clients.claim();
+    })()
   );
 });
 
+// Fetch strategy:
+// - Navigation (HTML): network-first, fallback cache (щоб офлайн відкривалось)
+// - Other same-origin: cache-first, fallback network
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // тільки для свого домену
-  if (url.origin !== location.origin) return;
+  // only for our origin (do not touch 3rd party)
+  if (url.origin !== self.location.origin) return;
 
-  // HTML: спочатку мережа, якщо нема — кеш
-  if (req.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname === "/") {
+  // HTML navigation requests
+  const isNav =
+    req.mode === "navigate" ||
+    (req.headers.get("accept") || "").includes("text/html");
+
+  if (isNav) {
     event.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-          return res;
-        })
-        .catch(() => caches.match(req).then((r) => r || caches.match("./index.html")))
+      (async () => {
+        try {
+          const fresh = await fetch(req, { cache: "no-store" });
+          const cache = await caches.open(CACHE_NAME);
+          cache.put("./index.html", fresh.clone()); // keep latest shell
+          return fresh;
+        } catch (e) {
+          const cached = await caches.match("./index.html");
+          return cached || caches.match("./") || new Response("Offline", { status: 503 });
+        }
+      })()
     );
     return;
   }
 
-  // все інше: спочатку кеш, якщо нема — мережа і докешувати
+  // Static assets
   event.respondWith(
-    caches.match(req).then((cached) => {
+    (async () => {
+      const cached = await caches.match(req);
       if (cached) return cached;
-      return fetch(req).then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-        return res;
-      });
-    })
+
+      const res = await fetch(req);
+      // cache successful same-origin GET
+      if (req.method === "GET" && res.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(req, res.clone());
+      }
+      return res;
+    })()
   );
 });
