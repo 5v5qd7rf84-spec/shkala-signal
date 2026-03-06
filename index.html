@@ -45,7 +45,7 @@
     .groupTitle{ display:flex; align-items:baseline; justify-content:space-between; gap:10px;
       font-weight:900; font-size:var(--fsTitle); margin-bottom:10px; }
     .sub{ font-size:12px; color:var(--muted); font-weight:700; }
-    .row{ display:flex; gap:12px; }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; }
     .field{ flex:1; min-width:0; }
     .label{ font-size:12px; color:var(--muted); margin:0 0 6px 2px; font-weight:800; }
     input, select, button{ font:inherit; color:inherit; }
@@ -174,14 +174,14 @@
 
 
       <div class="row" style="align-items:center;">
-        <div class="field" style="min-width: 200px;">
+        <div class="field">
           <div class="label">Тип сигналу</div>
           <select id="preset" style="width:100%; padding:12px 12px; border-radius:12px; border:1px solid var(--stroke2); background: rgba(0,0,0,.18); font-weight:900;">
             <option value="4-20">4–20 мА</option>
             <option value="0-5">0–5 мА</option>
           </select>
         </div>
-        <div class="field" style="min-width: 140px;">
+        <div class="field">
           <div class="label">Швидкі дії</div>
           <button class="btn primary" id="swap" type="button" style="width:100%;">Поміняти 0↔100%</button>
         </div>
