@@ -26,27 +26,25 @@
       --r:12px;
       --pad:10px;
 
-      --centerW: 74vw;
-      --centerH: 42px;
-      --fsBig: 24px;
-      --fsTitle: 15px;
-    }
-
-    @media (min-width: 520px){
-      :root{
-        --centerW: 290px;
-      }
+      --centerW:min(74vw, 290px);
+      --centerH:42px;
+      --fsBig:28px;
+      --fsTitle:16px;
     }
 
     *{box-sizing:border-box}
-    html,body{height:100%}
-
+    html{
+      height:100%;
+      -webkit-text-size-adjust:100%;
+    }
     body{
+      min-height:100%;
       margin:0;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
-      background: radial-gradient(900px 600px at 20% 0%, #13204a 0%, var(--bg) 55%);
+      background:radial-gradient(900px 600px at 20% 0%, #13204a 0%, var(--bg) 55%);
       color:var(--text);
       -webkit-text-size-adjust:100%;
+      overflow-x:hidden;
     }
 
     .app{
@@ -66,17 +64,20 @@
     .title{
       font-weight:800;
       letter-spacing:.2px;
-      font-size:18px;
+      font-size:clamp(18px, 4.8vw, 20px);
+      line-height:1.1;
     }
 
     .pill{
-      font-size:12px;
+      font-size:14px;
       color:#0b1020;
       background:linear-gradient(180deg,#74b7ff,var(--accent));
-      padding:5px 10px;
+      padding:8px 16px;
       border-radius:999px;
       font-weight:800;
       white-space:nowrap;
+      line-height:1;
+      flex-shrink:0;
     }
 
     .card{
@@ -86,13 +87,16 @@
       padding:var(--pad);
       backdrop-filter:blur(10px);
       box-shadow:0 10px 20px rgba(0,0,0,.25);
+      overflow:hidden;
     }
 
-    .card + .card{ margin-top:8px; }
+    .card + .card{
+      margin-top:8px;
+    }
 
     .groupTitle{
       display:flex;
-      align-items:baseline;
+      align-items:flex-start;
       justify-content:space-between;
       gap:8px;
       font-weight:900;
@@ -112,15 +116,16 @@
       justify-content:space-between;
       align-items:flex-end;
       flex-wrap:wrap;
+      width:100%;
     }
 
     .field{
-      flex:1;
+      flex:1 1 0;
       min-width:0;
     }
 
     .label{
-      font-size:11px;
+      font-size:12px;
       color:var(--muted);
       margin:0 0 4px 2px;
       font-weight:800;
@@ -130,6 +135,7 @@
     input, select, button{
       font:inherit;
       color:inherit;
+      font-size:16px;
     }
 
     input{
@@ -144,7 +150,19 @@
       min-height:38px;
     }
 
-    input:focus{
+    select{
+      width:100%;
+      min-height:38px;
+      border-radius:10px;
+      border:1px solid var(--stroke2);
+      background:rgba(0,0,0,.16);
+      font-weight:900;
+      padding:8px 10px;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus, select:focus{
       border-color:rgba(78,161,255,.75);
       box-shadow:0 0 0 3px rgba(78,161,255,.18);
     }
@@ -184,6 +202,7 @@
       background:rgba(0,0,0,.16);
       border:1px solid var(--stroke);
       border-radius:12px;
+      width:100%;
     }
 
     .seg input{
@@ -194,7 +213,7 @@
 
     .seg label{
       flex:1 1 0;
-      padding:6px 8px;
+      padding:8px 8px;
       border-radius:10px;
       font-weight:900;
       font-size:14px;
@@ -204,21 +223,14 @@
       user-select:none;
       -webkit-user-select:none;
       -webkit-tap-highlight-color:transparent;
+      min-width:0;
+      line-height:1.15;
     }
 
     .seg input:checked + label{
       background:rgba(78,161,255,.22);
       color:var(--text);
       border-color:rgba(78,161,255,.35);
-    }
-
-    .hintRow{
-      margin-top:8px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
     }
 
     .btn{
@@ -228,6 +240,9 @@
       border-radius:10px;
       font-weight:900;
       min-height:38px;
+      width:100%;
+      font-size:15px;
+      line-height:1.15;
     }
 
     .btn.primary{
@@ -247,26 +262,77 @@
       line-height:1.3;
     }
 
-    .pill2{
-      display:inline-block;
-      padding:3px 8px;
-      border-radius:999px;
-      border:1px solid var(--stroke);
-      color:var(--muted);
-      font-weight:800;
-      font-size:11px;
+    .hidden{
+      display:none !important;
     }
-
-    .hidden{ display:none !important; }
 
     .debug{
       font-size:11px;
       color:rgba(255,255,255,.55);
-      margin-top:6px;
+      margin-top:0;
+      white-space:nowrap;
+      flex-shrink:0;
     }
 
     .ok{ color:#7CFFB2; font-weight:900; }
     .bad{ color:#FFB3B3; font-weight:900; }
+
+    @media (max-width: 390px){
+      .app{
+        padding:8px 8px 12px;
+      }
+
+      .card{
+        padding:8px;
+      }
+
+      .title{
+        font-size:17px;
+      }
+
+      .pill{
+        font-size:13px;
+        padding:7px 14px;
+      }
+
+      .groupTitle{
+        font-size:15px;
+        margin-bottom:6px;
+      }
+
+      .row{
+        gap:6px;
+      }
+
+      .label{
+        font-size:11px;
+      }
+
+      .seg{
+        padding:2px;
+      }
+
+      .seg label{
+        padding:7px 6px;
+        font-size:13px;
+      }
+
+      .big{
+        height:40px;
+        font-size:24px;
+      }
+
+      input, select{
+        min-height:36px;
+        padding:6px 8px;
+      }
+
+      .btn{
+        min-height:36px;
+        padding:6px 8px;
+        font-size:14px;
+      }
+    }
   </style>
 </head>
 
@@ -280,8 +346,7 @@
     <section class="card">
       <div class="groupTitle">
         <span>Режим перетворення</span>
-         <div class="debug" id="dbg">JS: <span class="bad">не запущено</span></div>
-     </div>
+        <div class="debug" id="dbg">JS: <span class="bad">не запущено</span></div>
       </div>
 
       <div class="seg" aria-label="Режим">
@@ -293,10 +358,8 @@
 
         <input id="mFlow" name="mode" type="radio" value="flow">
         <label for="mFlow">Витрата</label>
-       </div>
-       </section>
-
-     
+      </div>
+    </section>
 
     <section class="card">
       <div class="groupTitle">
@@ -342,7 +405,7 @@
       <div class="row" style="margin-bottom:8px;">
         <div class="field">
           <div class="label">Тип сигналу</div>
-          <select id="preset" style="width:100%; padding:8px 10px; min-height:38px; border-radius:10px; border:1px solid var(--stroke2); background:rgba(0,0,0,.16); font-weight:900;">
+          <select id="preset">
             <option value="4-20">4–20 мА</option>
             <option value="0-5">0–5 мА</option>
           </select>
@@ -363,11 +426,11 @@
 
       <div class="row" style="margin-top:8px;">
         <div class="field">
-          <button class="btn primary" id="swap" type="button" style="width:100%;">Поміняти 20↔4</button>
+          <button class="btn primary" id="swap" type="button">Поміняти 20↔4</button>
         </div>
 
         <div class="field">
-          <button class="btn danger" id="reset" type="button" style="width:100%;">Скинути</button>
+          <button class="btn danger" id="reset" type="button">Скинути</button>
         </div>
       </div>
 
@@ -435,22 +498,10 @@
 
     if (mode === "sqrt"){
       $("modePill").textContent = "√";
-      $("xName").textContent = "Фізична величина";
-      $("lblX").textContent = "Шкала";
-      $("lblX0").textContent = "Початок";
-      $("lblX1").textContent = "Кінець";
     } else if (mode === "flow"){
       $("modePill").textContent = "Витрата";
-      $("xName").textContent = "Витрата (Q)";
-      $("lblX").textContent = "Шкала";
-      $("lblX0").textContent = "Початок";
-      $("lblX1").textContent = "Кінець";
     } else {
       $("modePill").textContent = "Лінійна";
-      $("xName").textContent = "Фізична величина";
-      $("lblX").textContent = "Шкала";
-      $("lblX0").textContent = "Початок";
-      $("lblX1").textContent = "Кінець";
     }
   }
 
@@ -540,9 +591,14 @@
     }
   }
 
+  function updateSwapButtonText(){
+    const a = $("y0").value;
+    const b = $("y1").value;
+    $("swap").textContent = `Поміняти ${b}↔${a}`;
+  }
+
   function applyPreset(){
     const v = $("preset").value;
-    $("sigName").textContent = (v === "4-20") ? "4–20 мА" : "0–5 мА";
 
     if (v === "4-20"){
       $("y0").value = "4";
@@ -552,6 +608,7 @@
       $("y1").value = "5";
     }
 
+    updateSwapButtonText();
     recalcFromX();
   }
 
@@ -559,6 +616,7 @@
     const a = $("y0").value;
     $("y0").value = $("y1").value;
     $("y1").value = a;
+    updateSwapButtonText();
     recalcFromX();
   }
 
@@ -600,14 +658,17 @@
   });
 
   ["x0","x1","q0","q1","xVal","y0","y1"].forEach(id => {
-    $(id).addEventListener("input", recalcFromX);
+    $(id).addEventListener("input", () => {
+      if (id === "y0" || id === "y1") updateSwapButtonText();
+      recalcFromX();
+    });
   });
 
   $("yVal").addEventListener("input", recalcFromY);
-$("preset").addEventListener("change", applyPreset);
-$("preset").addEventListener("input", applyPreset);
-$("swap").addEventListener("click", swapSignal);
-$("reset").addEventListener("click", resetAll);
+  $("preset").addEventListener("change", applyPreset);
+  $("preset").addEventListener("input", applyPreset);
+  $("swap").addEventListener("click", swapSignal);
+  $("reset").addEventListener("click", resetAll);
 
   setModeUI();
   applyPreset();
