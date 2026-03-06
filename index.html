@@ -604,9 +604,10 @@
   });
 
   $("yVal").addEventListener("input", recalcFromY);
-  $("preset").addEventListener("change", applyPreset);
-  $("swap").addEventListener("click", swapSignal);
-  $("reset").addEventListener("click", resetAll);
+$("preset").addEventListener("change", applyPreset);
+$("preset").addEventListener("input", applyPreset);
+$("swap").addEventListener("click", swapSignal);
+$("reset").addEventListener("click", resetAll);
 
   setModeUI();
   applyPreset();
