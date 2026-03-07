@@ -26,17 +26,23 @@
       --r:12px;
       --pad:10px;
 
-      --centerW:min(74vw, 290px);
+      --centerW:min(74vw, 300px);
       --centerH:42px;
       --fsBig:28px;
       --fsTitle:16px;
+      --fsLabel:12px;
+      --fsBtn:15px;
+      --controlH:38px;
+      --gap:8px;
     }
 
     *{box-sizing:border-box}
+
     html{
       height:100%;
       -webkit-text-size-adjust:100%;
     }
+
     body{
       min-height:100%;
       margin:0;
@@ -66,6 +72,7 @@
       letter-spacing:.2px;
       font-size:clamp(18px, 4.8vw, 20px);
       line-height:1.1;
+      min-width:0;
     }
 
     .pill{
@@ -102,21 +109,20 @@
       font-weight:900;
       font-size:var(--fsTitle);
       margin-bottom:8px;
-    }
-
-    .sub{
-      font-size:11px;
-      color:var(--muted);
-      font-weight:700;
+      line-height:1.15;
     }
 
     .row{
       display:flex;
-      gap:8px;
+      gap:var(--gap);
       justify-content:space-between;
       align-items:flex-end;
-      flex-wrap:wrap;
+      flex-wrap:nowrap;
       width:100%;
+    }
+
+    .row + .row{
+      margin-top:8px;
     }
 
     .field{
@@ -125,7 +131,7 @@
     }
 
     .label{
-      font-size:12px;
+      font-size:var(--fsLabel);
       color:var(--muted);
       margin:0 0 4px 2px;
       font-weight:800;
@@ -147,12 +153,14 @@
       outline:none;
       font-weight:800;
       letter-spacing:.2px;
-      min-height:38px;
+      height:var(--controlH);
+      min-height:var(--controlH);
     }
 
     select{
       width:100%;
-      min-height:38px;
+      height:var(--controlH);
+      min-height:var(--controlH);
       border-radius:10px;
       border:1px solid var(--stroke2);
       background:rgba(0,0,0,.16);
@@ -186,13 +194,14 @@
     .big{
       width:var(--centerW);
       height:var(--centerH);
+      min-height:var(--centerH);
       text-align:center;
       font-size:var(--fsBig);
       padding:4px 10px;
       border-radius:12px;
       border:1px solid rgba(255,255,255,.18);
       background:rgba(0,0,0,.18);
-      min-height:auto;
+      font-weight:800;
     }
 
     .seg{
@@ -239,9 +248,10 @@
       padding:8px 10px;
       border-radius:10px;
       font-weight:900;
-      min-height:38px;
+      height:var(--controlH);
+      min-height:var(--controlH);
       width:100%;
-      font-size:15px;
+      font-size:var(--fsBtn);
       line-height:1.15;
     }
 
@@ -272,18 +282,32 @@
       margin-top:0;
       white-space:nowrap;
       flex-shrink:0;
+      line-height:1.2;
     }
 
     .ok{ color:#7CFFB2; font-weight:900; }
     .bad{ color:#FFB3B3; font-weight:900; }
 
+    /* Маленькі телефони */
     @media (max-width: 390px){
+      :root{
+        --pad:8px;
+        --centerW:min(76vw, 270px);
+        --centerH:40px;
+        --fsBig:24px;
+        --fsTitle:15px;
+        --fsLabel:11px;
+        --fsBtn:14px;
+        --controlH:36px;
+        --gap:6px;
+      }
+
       .app{
         padding:8px 8px 12px;
       }
 
       .card{
-        padding:8px;
+        box-shadow:0 8px 16px rgba(0,0,0,.22);
       }
 
       .title{
@@ -296,16 +320,7 @@
       }
 
       .groupTitle{
-        font-size:15px;
         margin-bottom:6px;
-      }
-
-      .row{
-        gap:6px;
-      }
-
-      .label{
-        font-size:11px;
       }
 
       .seg{
@@ -318,19 +333,62 @@
       }
 
       .big{
-        height:40px;
         font-size:24px;
       }
 
-      input, select{
-        min-height:36px;
-        padding:6px 8px;
+      .btn{
+        font-size:14px;
+      }
+    }
+
+    /* Дуже вузькі телефони */
+    @media (max-width: 360px){
+      :root{
+        --centerW:min(80vw, 250px);
+        --fsBig:22px;
+        --fsBtn:13px;
+        --gap:6px;
       }
 
-      .btn{
-        min-height:36px;
-        padding:6px 8px;
-        font-size:14px;
+      .title{
+        font-size:16px;
+      }
+
+      .pill{
+        font-size:12px;
+        padding:6px 12px;
+      }
+
+      .seg label{
+        font-size:12px;
+        padding:6px 4px;
+      }
+
+      .debug{
+        font-size:10px;
+      }
+    }
+
+    /* Великі телефони */
+    @media (min-width: 430px){
+      :root{
+        --centerW:min(68vw, 320px);
+        --centerH:44px;
+        --fsBig:30px;
+        --fsTitle:17px;
+        --controlH:40px;
+      }
+
+      .app{
+        padding:12px 12px 16px;
+      }
+
+      .card{
+        padding:12px;
+      }
+
+      .pill{
+        padding:8px 18px;
       }
     }
   </style>
@@ -377,7 +435,7 @@
         </div>
       </div>
 
-      <div id="flowRange" class="row hidden" style="margin-top:8px;">
+      <div id="flowRange" class="row hidden">
         <div class="field">
           <div class="label">Початок, т/год</div>
           <input id="q0" inputmode="decimal" value="0">
@@ -402,7 +460,7 @@
         <span>Сигнал</span>
       </div>
 
-      <div class="row" style="margin-bottom:8px;">
+      <div class="row">
         <div class="field">
           <div class="label">Тип сигналу</div>
           <select id="preset">
@@ -424,7 +482,7 @@
         </div>
       </div>
 
-      <div class="row" style="margin-top:8px;">
+      <div class="row">
         <div class="field">
           <button class="btn primary" id="swap" type="button">Поміняти 20↔4</button>
         </div>
