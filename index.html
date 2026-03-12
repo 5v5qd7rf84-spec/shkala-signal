@@ -290,7 +290,6 @@
     .ok{ color:#7CFFB2; font-weight:900; }
     .bad{ color:#FFB3B3; font-weight:900; }
 
-    /* Маленькі телефони */
     @media (max-width: 390px){
       :root{
         --pad:8px;
@@ -343,7 +342,6 @@
       }
     }
 
-    /* Дуже вузькі телефони */
     @media (max-width: 360px){
       :root{
         --centerW:min(80vw, 250px);
@@ -371,7 +369,6 @@
       }
     }
 
-    /* Великі телефони */
     @media (min-width: 430px){
       :root{
         --centerW:min(68vw, 320px);
@@ -512,21 +509,16 @@
     if (value == null) return "";
 
     let s = String(value);
-
-    // прибираємо пробіли
     s = s.replace(/\s+/g, "");
-
-    // залишаємо тільки цифри, мінус, крапку і кому
     s = s.replace(/[^0-9,.\-]/g, "");
 
-    // мінус тільки один і тільки на початку
     const hasLeadingMinus = s.startsWith("-");
     s = s.replace(/-/g, "");
     if (hasLeadingMinus) s = "-" + s;
 
-    // лише один десятковий роздільник
     let out = "";
     let sepUsed = false;
+
     for (const ch of s) {
       if (ch === "." || ch === ",") {
         if (sepUsed) continue;
@@ -747,9 +739,6 @@
     $("y0").value = "4";
     $("y1").value = "20";
     $("yVal").value = "12";
-
-    mode = "linear";
-    $("mLinear").checked = true;
 
     setModeUI();
     applyPreset();
