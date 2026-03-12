@@ -429,32 +429,32 @@
       <div class="row">
         <div class="field">
           <div class="label" id="lblX0">Початок, кгс/см<sup>2</sup></div>
-          <input id="x0" inputmode="decimal" value="0">
+          <input id="x0" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="0">
         </div>
         <div class="field">
           <div class="label" id="lblX1">Кінець, кгс/см<sup>2</sup></div>
-          <input id="x1" inputmode="decimal" value="1">
+          <input id="x1" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="1">
         </div>
       </div>
 
       <div id="flowRange" class="row hidden">
         <div class="field">
           <div class="label">Початок, т/год</div>
-          <input id="q0" inputmode="decimal" value="0">
+          <input id="q0" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="0">
         </div>
         <div class="field">
           <div class="label">Кінець, т/год</div>
-          <input id="q1" inputmode="decimal" value="125">
+          <input id="q1" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="125">
         </div>
       </div>
     </section>
 
     <section class="card center">
       <div class="label" id="lblX">Шкала</div>
-      <input class="big" id="xVal" inputmode="decimal" value="0,5">
+      <input class="big" id="xVal" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="0,5">
 
       <div class="label" id="lblY">Сигнал</div>
-      <input class="big" id="yVal" inputmode="decimal" value="12">
+      <input class="big" id="yVal" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="12">
     </section>
 
     <section class="card">
@@ -475,12 +475,12 @@
       <div class="row">
         <div class="field">
           <div class="label">Початок, мА</div>
-          <input id="y0" inputmode="decimal" value="4">
+          <input id="y0" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="4">
         </div>
 
         <div class="field">
           <div class="label">Кінець, мА</div>
-          <input id="y1" inputmode="decimal" value="20">
+          <input id="y1" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="20">
         </div>
       </div>
 
@@ -508,10 +508,67 @@
   const dbg = $("dbg");
   if (dbg) dbg.innerHTML = 'JS: <span class="ok">OK</span>';
 
+  function normalizeSignedDecimalInput(value){
+    if (value == null) return "";
+
+    let s = String(value);
+
+    // прибираємо пробіли
+    s = s.replace(/\s+/g, "");
+
+    // залишаємо тільки цифри, мінус, крапку і кому
+    s = s.replace(/[^0-9,.\-]/g, "");
+
+    // мінус тільки один і тільки на початку
+    const hasLeadingMinus = s.startsWith("-");
+    s = s.replace(/-/g, "");
+    if (hasLeadingMinus) s = "-" + s;
+
+    // лише один десятковий роздільник
+    let out = "";
+    let sepUsed = false;
+    for (const ch of s) {
+      if (ch === "." || ch === ",") {
+        if (sepUsed) continue;
+        sepUsed = true;
+        out += ch;
+      } else {
+        out += ch;
+      }
+    }
+
+    return out;
+  }
+
+  function attachSignedDecimalBehavior(id){
+    const el = $(id);
+    if (!el) return;
+
+    el.addEventListener("input", () => {
+      const oldValue = el.value;
+      const oldPos = el.selectionStart;
+      const newValue = normalizeSignedDecimalInput(oldValue);
+
+      if (oldValue !== newValue) {
+        el.value = newValue;
+
+        try{
+          const diff = oldValue.length - newValue.length;
+          const newPos = Math.max(0, (oldPos || 0) - diff);
+          el.setSelectionRange(newPos, newPos);
+        } catch(e){}
+      }
+    });
+
+    el.addEventListener("blur", () => {
+      el.value = normalizeSignedDecimalInput(el.value);
+    });
+  }
+
   function parseNum(str){
     if (str == null) return null;
     const s = String(str).trim().replace(",", ".");
-    if (!s.length) return null;
+    if (!s.length || s === "-" || s === "." || s === "," || s === "-." || s === "-,") return null;
     const v = Number(s);
     return Number.isFinite(v) ? v : null;
   }
@@ -705,6 +762,11 @@
     setModeUI();
     recalcFromX();
   }
+
+  [
+    "x0","x1","q0","q1",
+    "xVal","y0","y1","yVal"
+  ].forEach(attachSignedDecimalBehavior);
 
   document.querySelectorAll('input[name="mode"]').forEach(inp => {
     inp.addEventListener("change", onModeChange);
