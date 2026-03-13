@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
   <title>Шкала–Сигнал</title>
 
   <link rel="manifest" href="./manifest.webmanifest">
@@ -34,6 +34,8 @@
       --fsBtn:15px;
       --controlH:38px;
       --gap:8px;
+
+      --keypadReserve: 260px;
     }
 
     *{box-sizing:border-box}
@@ -52,12 +54,17 @@
       color:var(--text);
       -webkit-text-size-adjust:100%;
       overflow-x:hidden;
+      touch-action:manipulation;
     }
 
     .app{
       max-width:560px;
       margin:0 auto;
-      padding:10px 10px 120px;
+      padding:10px 10px 14px;
+    }
+
+    body.keypad-open .app{
+      padding-bottom: calc(var(--keypadReserve) + env(safe-area-inset-bottom) + 20px);
     }
 
     .top{
@@ -156,17 +163,21 @@
       letter-spacing:.2px;
       height:var(--controlH);
       min-height:var(--controlH);
+      caret-color:transparent;
+      user-select:none;
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
     }
 
-    input:focus, select:focus{
-      border-color:rgba(78,161,255,.75);
-      box-shadow:0 0 0 3px rgba(78,161,255,.18);
+    input.numInput{
+      cursor:pointer;
+      touch-action:manipulation;
     }
 
-    .numInput.activeInput{
-      border-color:rgba(78,161,255,.85);
-      box-shadow:0 0 0 3px rgba(78,161,255,.20);
-      background:rgba(78,161,255,.10);
+    input.numInput.activeInput{
+      border-color:rgba(78,161,255,.92);
+      box-shadow:0 0 0 3px rgba(78,161,255,.22);
+      background:rgba(78,161,255,.11);
     }
 
     select{
@@ -180,6 +191,11 @@
       padding:8px 10px;
       color:var(--text);
       outline:none;
+    }
+
+    select:focus{
+      border-color:rgba(78,161,255,.75);
+      box-shadow:0 0 0 3px rgba(78,161,255,.18);
     }
 
     .center{
@@ -243,6 +259,7 @@
       -webkit-tap-highlight-color:transparent;
       min-width:0;
       line-height:1.15;
+      touch-action:manipulation;
     }
 
     .seg input:checked + label{
@@ -262,6 +279,8 @@
       width:100%;
       font-size:var(--fsBtn);
       line-height:1.15;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
     }
 
     .btn.primary{
@@ -293,37 +312,42 @@
       line-height:1.25;
     }
 
-    .assistBarWrap{
+    .keypadWrap{
       position:fixed;
       left:0;
       right:0;
       bottom:0;
       z-index:60;
       padding:8px 10px calc(8px + env(safe-area-inset-bottom));
-      background:linear-gradient(180deg, rgba(11,16,32,.15), rgba(11,16,32,.85) 25%, rgba(11,16,32,.96));
-      backdrop-filter:blur(10px);
+      background:linear-gradient(180deg, rgba(11,16,32,.32), rgba(11,16,32,.92) 18%, rgba(11,16,32,.98));
+      backdrop-filter:blur(14px);
       border-top:1px solid rgba(255,255,255,.08);
+      touch-action:manipulation;
+      -webkit-user-select:none;
+      user-select:none;
     }
 
-    .assistBar{
+    .keypad{
       max-width:560px;
       margin:0 auto;
-      display:flex;
-      align-items:center;
-      gap:8px;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
       border:1px solid var(--stroke);
-      border-radius:14px;
+      border-radius:16px;
       padding:8px;
-      box-shadow:0 -8px 20px rgba(0,0,0,.22);
+      box-shadow:0 -8px 20px rgba(0,0,0,.25);
+      touch-action:manipulation;
     }
 
-    .assistMeta{
-      min-width:0;
-      flex:1 1 auto;
+    .keypadTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:8px;
+      padding:0 2px;
     }
 
-    .assistTitle{
+    .keypadLabel{
       font-size:12px;
       font-weight:900;
       color:#d7e0ff;
@@ -332,29 +356,26 @@
       text-overflow:ellipsis;
     }
 
-    .assistHint{
+    .keypadHint{
       font-size:11px;
       color:var(--muted);
-      margin-top:2px;
       white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .assistBtns{
-      display:flex;
-      gap:6px;
       flex-shrink:0;
     }
 
-    .assistBtn{
-      min-width:48px;
-      height:40px;
+    .keypadGrid{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:6px;
+    }
+
+    .key{
+      height:48px;
       border-radius:12px;
       border:1px solid var(--stroke2);
       background:rgba(255,255,255,.06);
       color:var(--text);
-      font-size:22px;
+      font-size:20px;
       font-weight:900;
       display:flex;
       align-items:center;
@@ -362,14 +383,27 @@
       -webkit-tap-highlight-color:transparent;
       user-select:none;
       -webkit-user-select:none;
+      -webkit-touch-callout:none;
+      touch-action:manipulation;
     }
 
-    .assistBtn.secondary{
-      font-size:15px;
-      padding:0 12px;
-      min-width:64px;
+    .key.small{
+      font-size:14px;
+    }
+
+    .key.action{
       background:rgba(78,161,255,.16);
       border-color:rgba(78,161,255,.35);
+    }
+
+    .key.warn{
+      background:rgba(255,107,107,.12);
+      border-color:rgba(255,107,107,.35);
+    }
+
+    .key:active{
+      transform:scale(0.98);
+      filter:brightness(1.08);
     }
 
     .hidden{
@@ -399,10 +433,11 @@
         --fsBtn:14px;
         --controlH:36px;
         --gap:6px;
+        --keypadReserve: 248px;
       }
 
       .app{
-        padding:8px 8px 112px;
+        padding:8px 8px 12px;
       }
 
       .card{
@@ -439,9 +474,9 @@
         font-size:14px;
       }
 
-      .assistBtn{
-        min-width:44px;
-        height:38px;
+      .key{
+        height:42px;
+        font-size:18px;
       }
     }
 
@@ -479,10 +514,11 @@
         --fsBig:30px;
         --fsTitle:17px;
         --controlH:40px;
+        --keypadReserve: 272px;
       }
 
       .app{
-        padding:12px 12px 124px;
+        padding:12px 12px 16px;
       }
 
       .card{
@@ -529,32 +565,32 @@
       <div class="row">
         <div class="field">
           <div class="label" id="lblX0">Початок, кгс/см<sup>2</sup></div>
-          <input class="numInput" id="x0" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" value="0">
+          <input class="numInput" id="x0" type="text" readonly value="0">
         </div>
         <div class="field">
           <div class="label" id="lblX1">Кінець, кгс/см<sup>2</sup></div>
-          <input class="numInput" id="x1" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" value="1">
+          <input class="numInput" id="x1" type="text" readonly value="1">
         </div>
       </div>
 
       <div id="flowRange" class="row hidden">
         <div class="field">
           <div class="label">Початок, т/год</div>
-          <input class="numInput" id="q0" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" value="0">
+          <input class="numInput" id="q0" type="text" readonly value="0">
         </div>
         <div class="field">
           <div class="label">Кінець, т/год</div>
-          <input class="numInput" id="q1" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" value="125">
+          <input class="numInput" id="q1" type="text" readonly value="125">
         </div>
       </div>
     </section>
 
     <section class="card center">
       <div class="label" id="lblX">Шкала</div>
-      <input class="big numInput" id="xVal" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" value="0,5">
+      <input class="big numInput" id="xVal" type="text" readonly value="0,5">
 
       <div class="label" id="lblY">Сигнал</div>
-      <input class="big numInput" id="yVal" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" value="12">
+      <input class="big numInput" id="yVal" type="text" readonly value="12">
     </section>
 
     <section class="card">
@@ -575,12 +611,12 @@
       <div class="row">
         <div class="field">
           <div class="label">Початок, мА</div>
-          <input class="numInput" id="y0" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" value="4">
+          <input class="numInput" id="y0" type="text" readonly value="4">
         </div>
 
         <div class="field">
           <div class="label">Кінець, мА</div>
-          <input class="numInput" id="y1" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" value="20">
+          <input class="numInput" id="y1" type="text" readonly value="20">
         </div>
       </div>
 
@@ -597,21 +633,38 @@
       <div id="errorBox" class="errorBox hidden">Введіть необхідні значення.</div>
 
       <div class="foot" id="helpText" style="display:none;">
-        Цифри вводяться системною клавіатурою iPhone. Кнопки «-» і «,» додаються внизу.
+        Натисни на поле, потім вводь значення нижньою клавіатурою.
       </div>
     </section>
   </main>
 
-  <div class="assistBarWrap hidden" id="assistBarWrap">
-    <div class="assistBar">
-      <div class="assistMeta">
-        <div class="assistTitle" id="assistFieldName">Активне поле</div>
-        <div class="assistHint">Додаткові символи для введення</div>
+  <div class="keypadWrap hidden" id="keypadWrap">
+    <div class="keypad" id="keypad">
+      <div class="keypadTop">
+        <div class="keypadLabel" id="activeFieldLabel">Активне поле</div>
+        <div class="keypadHint">Власна клавіатура</div>
       </div>
-      <div class="assistBtns">
-        <button class="assistBtn" type="button" id="insertMinus">-</button>
-        <button class="assistBtn" type="button" id="insertComma">,</button>
-        <button class="assistBtn secondary" type="button" id="doneEdit">OK</button>
+
+      <div class="keypadGrid">
+        <button class="key" type="button" data-key="1">1</button>
+        <button class="key" type="button" data-key="2">2</button>
+        <button class="key" type="button" data-key="3">3</button>
+        <button class="key warn small" type="button" data-action="backspace">⌫</button>
+
+        <button class="key" type="button" data-key="4">4</button>
+        <button class="key" type="button" data-key="5">5</button>
+        <button class="key" type="button" data-key="6">6</button>
+        <button class="key warn small" type="button" data-action="clear">C</button>
+
+        <button class="key" type="button" data-key="7">7</button>
+        <button class="key" type="button" data-key="8">8</button>
+        <button class="key" type="button" data-key="9">9</button>
+        <button class="key action" type="button" data-key="-">-</button>
+
+        <button class="key action" type="button" data-key=",">,</button>
+        <button class="key" type="button" data-key="0">0</button>
+        <button class="key action small" type="button" data-action="ok">OK</button>
+        <button class="key action small" type="button" data-action="plusminus">±</button>
       </div>
     </div>
   </div>
@@ -638,32 +691,12 @@
   let mode = "linear";
   let updating = false;
   let activeFieldId = null;
+  let lastTapTs = 0;
 
-  function normalizeSignedDecimalInput(value){
-    if (value == null) return "";
-
-    let s = String(value);
-    s = s.replace(/\s+/g, "");
-    s = s.replace(/[^0-9,.\-]/g, "");
-
-    const hasLeadingMinus = s.startsWith("-");
-    s = s.replace(/-/g, "");
-    if (hasLeadingMinus) s = "-" + s;
-
-    let out = "";
-    let sepUsed = false;
-
-    for (const ch of s) {
-      if (ch === "." || ch === ",") {
-        if (sepUsed) continue;
-        sepUsed = true;
-        out += ",";
-      } else {
-        out += ch;
-      }
-    }
-
-    return out;
+  function vibrateTap() {
+    try {
+      if (navigator.vibrate) navigator.vibrate(10);
+    } catch(e){}
   }
 
   function parseNum(str){
@@ -697,91 +730,116 @@
     showError();
   }
 
-  function showAssistBar(){
-    $("assistBarWrap").classList.remove("hidden");
+  function isUnknownValue(v){
+    return v === "???";
   }
 
-  function hideAssistBar(){
-    $("assistBarWrap").classList.add("hidden");
+  function normalizeSignedDecimalInput(value){
+    if (value == null) return "";
+
+    let s = String(value).replace(/\s+/g, "");
+
+    if (s === "???") return "";
+
+    s = s.replace(/[^0-9,.\-]/g, "");
+
+    const hasLeadingMinus = s.startsWith("-");
+    s = s.replace(/-/g, "");
+    if (hasLeadingMinus) s = "-" + s;
+
+    let out = "";
+    let sepUsed = false;
+
+    for (const ch of s) {
+      if (ch === "." || ch === ",") {
+        if (sepUsed) continue;
+        sepUsed = true;
+        out += ",";
+      } else {
+        out += ch;
+      }
+    }
+
+    return out;
   }
 
-  function updateAssistFieldName(){
-    $("assistFieldName").textContent = activeFieldId ? ("Поле: " + (fieldLabels[activeFieldId] || activeFieldId)) : "Активне поле";
+  function showKeypad(){
+    document.body.classList.add("keypad-open");
+    $("keypadWrap").classList.remove("hidden");
   }
 
-  function clearActiveState(){
-    activeFieldId = null;
-    numericIds.forEach(id => $(id).classList.remove("activeInput"));
-    updateAssistFieldName();
-    hideAssistBar();
+  function hideKeypad(){
+    document.body.classList.remove("keypad-open");
+    $("keypadWrap").classList.add("hidden");
   }
 
-  function getActiveField(){
-    return activeFieldId ? $(activeFieldId) : null;
+  function getKeypadHeight(){
+    const wrap = $("keypadWrap");
+    if (!wrap || wrap.classList.contains("hidden")) return 0;
+    return wrap.offsetHeight || 0;
   }
 
-  function placeCaretToEnd(el){
-    try{
-      const len = el.value.length;
-      el.setSelectionRange(len, len);
-    } catch(e){}
-  }
-
-  function ensureFieldVisible(el){
+  function scrollFieldIntoView(el){
     if (!el) return;
 
     requestAnimationFrame(() => {
       setTimeout(() => {
         const rect = el.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
-        const assistBarHeight = $("assistBarWrap").classList.contains("hidden") ? 0 : $("assistBarWrap").offsetHeight;
-        const keyboardReserve = Math.max(assistBarHeight + 260, 330);
-        const targetBottom = viewportHeight - keyboardReserve;
-        const topSafe = 76;
+        const keypadHeight = getKeypadHeight();
+        const desiredTop = 72;
+        const desiredBottom = viewportHeight - keypadHeight - 18;
 
-        if (rect.bottom > targetBottom) {
-          const delta = rect.bottom - targetBottom + 18;
+        if (rect.bottom > desiredBottom) {
+          const delta = rect.bottom - desiredBottom;
           window.scrollTo({
             top: window.scrollY + delta,
             behavior: "smooth"
           });
-        } else if (rect.top < topSafe) {
-          const delta = topSafe - rect.top;
+        } else if (rect.top < desiredTop) {
+          const delta = desiredTop - rect.top;
           window.scrollTo({
             top: Math.max(0, window.scrollY - delta),
             behavior: "smooth"
           });
         }
-      }, 80);
+      }, 50);
     });
   }
 
   function setActiveField(id){
     if (!numericIds.includes(id)) return;
-
     activeFieldId = id;
-    numericIds.forEach(fid => $(fid).classList.toggle("activeInput", fid === id));
-    updateAssistFieldName();
-    showAssistBar();
 
-    const el = $(id);
-    if (document.activeElement !== el) {
-      el.focus({ preventScroll: true });
-    }
-    placeCaretToEnd(el);
-    ensureFieldVisible(el);
+    numericIds.forEach(fid => {
+      const el = $(fid);
+      if (el) el.classList.toggle("activeInput", fid === id);
+    });
+
+    $("activeFieldLabel").textContent = "Активне поле: " + (fieldLabels[id] || id);
+    showKeypad();
+    scrollFieldIntoView($(id));
   }
 
-  function sanitizeAllNumericFields(){
-    numericIds.forEach(id => {
-      const el = $(id);
-      if (!el) return;
-      if (el.value === "???") return;
-      el.value = normalizeSignedDecimalInput(el.value);
+  function clearActiveFieldStyles(){
+    numericIds.forEach(fid => {
+      const el = $(fid);
+      if (el) el.classList.remove("activeInput");
     });
   }
 
+  function clearActiveField(){
+    activeFieldId = null;
+    clearActiveFieldStyles();
+  }
+
+  function getActiveField(){
+    return activeFieldId ? $(activeFieldId) : null;
+  }
+
   function triggerRecalcForField(id){
+    if (!id) return;
+
     if (id === "yVal") {
       recalcFromY();
     } else {
@@ -790,36 +848,80 @@
     }
   }
 
-  function insertAtCursor(text){
+  function insertIntoActive(char){
     const el = getActiveField();
     if (!el) return;
 
-    if (el.value === "???") el.value = "";
+    let value = el.value;
+    if (isUnknownValue(value)) value = "";
 
-    const start = el.selectionStart ?? el.value.length;
-    const end = el.selectionEnd ?? el.value.length;
-    const before = el.value.slice(0, start);
-    const after = el.value.slice(end);
+    value += char;
+    value = normalizeSignedDecimalInput(value);
 
-    el.value = normalizeSignedDecimalInput(before + text + after);
+    el.value = value;
+    triggerRecalcForField(activeFieldId);
+    scrollFieldIntoView(el);
+    vibrateTap();
+  }
 
-    const newPos = Math.min((before + text).length, el.value.length);
-    try{
-      el.setSelectionRange(newPos, newPos);
-    } catch(e){}
+  function backspaceActive(){
+    const el = getActiveField();
+    if (!el) return;
+
+    let value = el.value;
+    if (isUnknownValue(value)) value = "";
+
+    value = value.slice(0, -1);
+    el.value = normalizeSignedDecimalInput(value);
 
     triggerRecalcForField(activeFieldId);
-    ensureFieldVisible(el);
+    scrollFieldIntoView(el);
+    vibrateTap();
+  }
+
+  function clearActive(){
+    const el = getActiveField();
+    if (!el) return;
+
+    el.value = "";
+    triggerRecalcForField(activeFieldId);
+    scrollFieldIntoView(el);
+    vibrateTap();
+  }
+
+  function toggleSignActive(){
+    const el = getActiveField();
+    if (!el) return;
+
+    let value = el.value;
+    if (isUnknownValue(value)) value = "";
+
+    value = normalizeSignedDecimalInput(value);
+
+    if (!value.length) {
+      el.value = "-";
+    } else if (value.startsWith("-")) {
+      el.value = value.slice(1);
+    } else {
+      el.value = "-" + value;
+    }
+
+    el.value = normalizeSignedDecimalInput(el.value);
+    triggerRecalcForField(activeFieldId);
+    scrollFieldIntoView(el);
+    vibrateTap();
   }
 
   function finishEdit(){
     const el = getActiveField();
     if (el) {
-      if (el.value !== "???") el.value = normalizeSignedDecimalInput(el.value);
+      el.value = normalizeSignedDecimalInput(el.value);
       triggerRecalcForField(activeFieldId);
-      el.blur();
     }
-    clearActiveState();
+
+    clearActiveField();
+    hideKeypad();
+    vibrateTap();
   }
 
   function isValidCommonRanges(){
@@ -1058,11 +1160,8 @@
     setModeUI();
     applyPreset();
     recalcFromX();
-    clearActiveState();
-
-    if (document.activeElement && typeof document.activeElement.blur === "function") {
-      document.activeElement.blur();
-    }
+    clearActiveField();
+    hideKeypad();
   }
 
   function onModeChange(){
@@ -1072,31 +1171,16 @@
     recalcFromX();
   }
 
-  numericIds.forEach(id => {
-    const el = $(id);
-
-    el.addEventListener("focus", () => {
-      setActiveField(id);
-    });
-
-    el.addEventListener("click", () => {
-      setActiveField(id);
-    });
-
-    el.addEventListener("input", () => {
-      if (el.value !== "???") {
-        el.value = normalizeSignedDecimalInput(el.value);
+  function preventDoubleTapZoomOnKeypad() {
+    const keypad = $("keypad");
+    keypad.addEventListener("touchend", (e) => {
+      const now = Date.now();
+      if (now - lastTapTs < 300) {
+        e.preventDefault();
       }
-      triggerRecalcForField(id);
-      ensureFieldVisible(el);
-    });
-
-    el.addEventListener("blur", () => {
-      if (el.value !== "???") {
-        el.value = normalizeSignedDecimalInput(el.value);
-      }
-    });
-  });
+      lastTapTs = now;
+    }, { passive:false });
+  }
 
   document.querySelectorAll('input[name="mode"]').forEach(inp => {
     inp.addEventListener("change", onModeChange);
@@ -1109,33 +1193,75 @@
     lbl.addEventListener("click", fire);
   });
 
-  $("insertMinus").addEventListener("click", () => insertAtCursor("-"));
-  $("insertComma").addEventListener("click", () => insertAtCursor(","));
-  $("doneEdit").addEventListener("click", finishEdit);
+  numericIds.forEach(id => {
+    const el = $(id);
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setActiveField(id);
+    });
+    el.addEventListener("touchstart", (e) => {
+      e.stopPropagation();
+      setActiveField(id);
+    }, {passive:true});
+  });
+
+  document.querySelectorAll("[data-key]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!activeFieldId) return;
+      insertIntoActive(btn.dataset.key);
+    });
+  });
+
+  document.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!activeFieldId && btn.dataset.action !== "ok") return;
+
+      const action = btn.dataset.action;
+
+      if (action === "backspace") backspaceActive();
+      if (action === "clear") clearActive();
+      if (action === "ok") finishEdit();
+      if (action === "plusminus") toggleSignActive();
+    });
+  });
 
   $("preset").addEventListener("change", applyPreset);
-  $("preset").addEventListener("input", applyPreset);
   $("swap").addEventListener("click", swapSignal);
   $("reset").addEventListener("click", resetAll);
 
-  window.addEventListener("resize", () => {
-    const el = getActiveField();
-    if (el) ensureFieldVisible(el);
-  });
-
   document.addEventListener("click", (e) => {
-    const inAssist = e.target.closest("#assistBarWrap");
-    const inInput = e.target.closest(".numInput");
-    if (!inAssist && !inInput && activeFieldId) {
-      finishEdit();
+    const clickedInput = e.target.closest(".numInput");
+    const clickedKeypad = e.target.closest("#keypad");
+
+    if (!clickedInput && !clickedKeypad) {
+      clearActiveField();
+      hideKeypad();
     }
   });
 
-  sanitizeAllNumericFields();
+  document.addEventListener("touchstart", (e) => {
+    const touchedInput = e.target.closest(".numInput");
+    const touchedKeypad = e.target.closest("#keypad");
+
+    if (!touchedInput && !touchedKeypad) {
+      clearActiveField();
+      hideKeypad();
+    }
+  }, {passive:true});
+
+  window.addEventListener("resize", () => {
+    const el = getActiveField();
+    if (el) scrollFieldIntoView(el);
+  });
+
+  preventDoubleTapZoomOnKeypad();
+
   setModeUI();
   applyPreset();
   hideError();
-  hideAssistBar();
+  hideKeypad();
   recalcFromX();
 })();
 </script>
