@@ -181,14 +181,14 @@
       align-items:center;
       gap:6px;
       padding-top:2px;
-      padding-bottom:10;
+      padding-bottom:10px;
     }
 
     .center .label{
       text-align:center;
       width:100%;
       font-size:14px;
-      margin:4px 0 2;
+      margin:4px 0 2px;
       color:#d7e0ff;
       font-weight:900;
     }
@@ -272,6 +272,18 @@
       color:var(--muted);
       font-size:11px;
       line-height:1.3;
+    }
+
+    .errorBox{
+      margin-top:8px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,107,107,.65);
+      background:rgba(255,107,107,.12);
+      color:#ffd6d6;
+      font-size:13px;
+      font-weight:800;
+      line-height:1.25;
     }
 
     .hidden{
@@ -491,6 +503,8 @@
         </div>
       </div>
 
+      <div id="errorBox" class="errorBox hidden">Введіть необхідні значення.</div>
+
       <div class="foot" id="helpText" style="display:none;">
         Якщо у твоєму переглядачі кнопки не реагують — це обмеження “перегляду файлу”.
         Ця версія спеціально зроблена так, щоб працювати навіть у таких режимах.
@@ -574,6 +588,47 @@
     return v < 0 ? 0 : (v > 1 ? 1 : v);
   }
 
+  function showError(){
+    $("errorBox").classList.remove("hidden");
+  }
+
+  function hideError(){
+    $("errorBox").classList.add("hidden");
+  }
+
+  function setUnknown(target){
+    if (target === "x") $("xVal").value = "???";
+    if (target === "y") $("yVal").value = "???";
+    if (target === "both"){
+      $("xVal").value = "???";
+      $("yVal").value = "???";
+    }
+    showError();
+  }
+
+  function isValidCommonRanges(){
+    const x0 = parseNum($("x0").value);
+    const x1 = parseNum($("x1").value);
+    const y0 = parseNum($("y0").value);
+    const y1 = parseNum($("y1").value);
+
+    if ([x0,x1,y0,y1].some(v => v === null)) return false;
+    if ((x1 - x0) === 0) return false;
+    if ((y1 - y0) === 0) return false;
+
+    return true;
+  }
+
+  function isValidFlowRange(){
+    const q0 = parseNum($("q0").value);
+    const q1 = parseNum($("q1").value);
+
+    if ([q0,q1].some(v => v === null)) return false;
+    if ((q1 - q0) === 0) return false;
+
+    return true;
+  }
+
   function rangesXY(){
     const x0 = parseNum($("x0").value);
     const x1 = parseNum($("x1").value);
@@ -616,8 +671,22 @@
 
   function recalcFromX(){
     if (updating) return;
+
+    if (!isValidCommonRanges()) {
+      setUnknown("y");
+      return;
+    }
+
+    if (mode === "flow" && !isValidFlowRange()) {
+      setUnknown("y");
+      return;
+    }
+
     const rr = rangesXY();
-    if (!rr) return;
+    if (!rr) {
+      setUnknown("y");
+      return;
+    }
 
     const {xr, yr} = rr;
 
@@ -626,7 +695,11 @@
       if (mode === "flow"){
         const qr = rangeQ();
         const q = parseNum($("xVal").value);
-        if (!qr || q === null) return;
+
+        if (!qr || q === null){
+          setUnknown("y");
+          return;
+        }
 
         let u = (q - qr.a) / qr.span;
         u = clamp01(u);
@@ -637,11 +710,15 @@
         const i = yr.a + yr.span * t;
 
         $("yVal").value = fmt(i);
+        hideError();
         return;
       }
 
       const x = parseNum($("xVal").value);
-      if (x === null) return;
+      if (x === null){
+        setUnknown("y");
+        return;
+      }
 
       let y;
       if (mode === "sqrt"){
@@ -653,6 +730,7 @@
       }
 
       $("yVal").value = fmt(y);
+      hideError();
     } finally {
       updating = false;
     }
@@ -660,18 +738,39 @@
 
   function recalcFromY(){
     if (updating) return;
+
+    if (!isValidCommonRanges()) {
+      setUnknown("x");
+      return;
+    }
+
+    if (mode === "flow" && !isValidFlowRange()) {
+      setUnknown("x");
+      return;
+    }
+
     const rr = rangesXY();
-    if (!rr) return;
+    if (!rr) {
+      setUnknown("x");
+      return;
+    }
 
     const {xr, yr} = rr;
     const y = parseNum($("yVal").value);
-    if (y === null) return;
+
+    if (y === null){
+      setUnknown("x");
+      return;
+    }
 
     updating = true;
     try{
       if (mode === "flow"){
         const qr = rangeQ();
-        if (!qr) return;
+        if (!qr){
+          setUnknown("x");
+          return;
+        }
 
         let t = (y - yr.a) / yr.span;
         t = clamp01(t);
@@ -682,6 +781,7 @@
         const q = qr.a + qr.span * Math.sqrt(s);
 
         $("xVal").value = fmt(q);
+        hideError();
         return;
       }
 
@@ -695,6 +795,7 @@
       }
 
       $("xVal").value = fmt(x);
+      hideError();
     } finally {
       updating = false;
     }
@@ -740,6 +841,7 @@
     $("y1").value = "20";
     $("yVal").value = "12";
 
+    hideError();
     setModeUI();
     applyPreset();
     recalcFromX();
@@ -781,6 +883,7 @@
   $("swap").addEventListener("click", swapSignal);
   $("reset").addEventListener("click", resetAll);
 
+  hideError();
   setModeUI();
   applyPreset();
   recalcFromX();
