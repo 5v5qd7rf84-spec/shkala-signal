@@ -596,13 +596,9 @@
     $("errorBox").classList.add("hidden");
   }
 
-  function setUnknown(target){
-    if (target === "x") $("xVal").value = "???";
-    if (target === "y") $("yVal").value = "???";
-    if (target === "both"){
-      $("xVal").value = "???";
-      $("yVal").value = "???";
-    }
+  function setUnknown(){
+    $("xVal").value = "???";
+    $("yVal").value = "???";
     showError();
   }
 
@@ -673,18 +669,18 @@
     if (updating) return;
 
     if (!isValidCommonRanges()) {
-      setUnknown("y");
+      setUnknown();
       return;
     }
 
     if (mode === "flow" && !isValidFlowRange()) {
-      setUnknown("y");
+      setUnknown();
       return;
     }
 
     const rr = rangesXY();
     if (!rr) {
-      setUnknown("y");
+      setUnknown();
       return;
     }
 
@@ -697,7 +693,7 @@
         const q = parseNum($("xVal").value);
 
         if (!qr || q === null){
-          setUnknown("y");
+          setUnknown();
           return;
         }
 
@@ -716,7 +712,7 @@
 
       const x = parseNum($("xVal").value);
       if (x === null){
-        setUnknown("y");
+        setUnknown();
         return;
       }
 
@@ -740,18 +736,18 @@
     if (updating) return;
 
     if (!isValidCommonRanges()) {
-      setUnknown("x");
+      setUnknown();
       return;
     }
 
     if (mode === "flow" && !isValidFlowRange()) {
-      setUnknown("x");
+      setUnknown();
       return;
     }
 
     const rr = rangesXY();
     if (!rr) {
-      setUnknown("x");
+      setUnknown();
       return;
     }
 
@@ -759,7 +755,7 @@
     const y = parseNum($("yVal").value);
 
     if (y === null){
-      setUnknown("x");
+      setUnknown();
       return;
     }
 
@@ -768,7 +764,7 @@
       if (mode === "flow"){
         const qr = rangeQ();
         if (!qr){
-          setUnknown("x");
+          setUnknown();
           return;
         }
 
