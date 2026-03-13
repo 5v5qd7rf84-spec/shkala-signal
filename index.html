@@ -406,6 +406,27 @@
       filter:brightness(1.08);
     }
 
+    .devSignature{
+      position:fixed;
+      right:12px;
+      bottom:10px;
+      font-size:10px;
+      color:rgba(255,255,255,.30);
+      letter-spacing:.4px;
+      pointer-events:none;
+      z-index:5;
+    }
+
+    .devSignature::before{
+      content:"";
+      display:inline-block;
+      width:16px;
+      height:1px;
+      background:rgba(255,255,255,.20);
+      margin-right:6px;
+      vertical-align:middle;
+    }
+
     .hidden{
       display:none !important;
     }
@@ -668,6 +689,8 @@
       </div>
     </div>
   </div>
+
+  <div class="devSignature">by Anatoliy Sharata</div>
 
 <script>
 (function(){
